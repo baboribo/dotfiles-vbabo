@@ -3,15 +3,15 @@
 // Configuration
 
 // Set the color of the cursor trail to match the user's cursor color
-const Color = "#A052FF" // If set to "default," it will use the theme's cursor color.
+const Color = "#d0aeff" // If set to "default," it will use the theme's cursor color.
 // ! default will only reference editorCursor.background
 // "workbench.colorCustomizations": {
-//     "editorCursor.background": "#A052FF",
+//     "editorCursor.background": "#cac7ce",
 // }
 
 // Set the style of the cursor to either a line or block
 // line option use fill() to draw trail, block option use lineTo to draw trail
-const CursorStyle = "block" // Options are 'line' or 'block'
+const CursorStyle = "line" // Options are 'line' or 'block'
 
 // Set the length of the cursor trail. A higher value may cause lag.
 const TrailLength = 8 // Recommended value is around 8
@@ -20,27 +20,27 @@ const TrailLength = 8 // Recommended value is around 8
 const CursorUpdatePollingRate = 500 // Recommended value is around 500
 
 // Use shadow
-const UseShadow = false
-const ShadowColor = Color
-const ShadowBlur = 15
+const UseShadow = true
+const ShadowColor = Color // "#ffffff"
+const ShadowBlur = 34
 
 
 // imported from https://github.com/tholman/cursor-effects/blob/master/src/rainbowCursor.js
 function createTrail(options) {
-  const totalParticles = options?.length || 20
-  let particlesColor = options?.color || "#A052FF"
+  const totalParticles = options?.length || 30
+  let particlesColor = options?.color || "#9957f5"
   const style = options?.style || "block"
   const canvas = options?.canvas
   const context = canvas.getContext("2d")
   let cursor = { x: 0, y: 0 }
   let particles = []
-  let width,height
-  let sizeX = options?.size || 3
-  let sizeY = options?.sizeY || sizeX*2.2
+  let width, height
+  let sizeX = options?.size || 1
+  let sizeY = options?.sizeY || sizeX * 2.2
   let cursorsInitted = false
 
   // update canvas size
-  function updateSize(x,y) {
+  function updateSize(x, y) {
     width = x
     height = y
     canvas.width = x
@@ -48,8 +48,8 @@ function createTrail(options) {
   }
 
   // update cursor position
-  function move(x,y) {
-    x = x + sizeX/2
+  function move(x, y) {
+    x = x + sizeX / 2
     cursor.x = x
     cursor.y = y
     if (cursorsInitted === false) {
@@ -72,7 +72,7 @@ function createTrail(options) {
   }
 
   function calculatePosition() {
-    let x = cursor.x,y = cursor.y
+    let x = cursor.x, y = cursor.y
 
     for (const particleIndex in particles) {
       const nextParticlePos = (particles[+particleIndex + 1] || particles[0]).position
@@ -80,9 +80,9 @@ function createTrail(options) {
 
       particlePos.x = x;
       particlePos.y = y;
-      
-      x += (nextParticlePos.x - particlePos.x) * 0.42
-      y += (nextParticlePos.y - particlePos.y) * 0.35
+
+      x += (nextParticlePos.x - particlePos.x) * 0.42 // 가로 추적 속도
+      y += (nextParticlePos.y - particlePos.y) * 0.38 // 세로 추적 속도
     }
   }
 
@@ -91,7 +91,7 @@ function createTrail(options) {
     context.beginPath()
     context.lineJoin = "round"
     context.strokeStyle = particlesColor
-    const lineWidth = Math.min(sizeX,sizeY)
+    const lineWidth = Math.min(sizeX, sizeY)
     context.lineWidth = lineWidth
 
     if (UseShadow) {
@@ -100,15 +100,15 @@ function createTrail(options) {
     }
 
     // draw 3 lines
-    let ymut = (sizeY-lineWidth)/3
-    for (let yoffset=0;yoffset<=3;yoffset++) {
-      let offset = yoffset*ymut
+    let ymut = (sizeY - lineWidth) / 3
+    for (let yoffset = 0; yoffset <= 3; yoffset++) {
+      let offset = yoffset * ymut
       for (const particleIndex in particles) {
         const pos = particles[particleIndex].position
         if (particleIndex == 0) {
-          context.moveTo(pos.x, pos.y + offset + lineWidth/2)
+          context.moveTo(pos.x, pos.y + offset + lineWidth / 2)
         } else {
-          context.lineTo(pos.x, pos.y + offset + lineWidth/2)
+          context.lineTo(pos.x, pos.y + offset + lineWidth / 2)
         }
       }
     }
@@ -125,7 +125,7 @@ function createTrail(options) {
     }
 
     // draw path
-    for (let particleIndex=0;particleIndex<totalParticles;particleIndex++) {
+    for (let particleIndex = 0; particleIndex < totalParticles; particleIndex++) {
       const pos = particles[+particleIndex].position
       if (particleIndex == 0) {
         context.moveTo(pos.x, pos.y)
@@ -133,9 +133,9 @@ function createTrail(options) {
         context.lineTo(pos.x, pos.y)
       }
     }
-    for (let particleIndex=totalParticles-1;particleIndex>=0;particleIndex--) {
+    for (let particleIndex = totalParticles - 1; particleIndex >= 0; particleIndex--) {
       const pos = particles[+particleIndex].position
-      context.lineTo(pos.x, pos.y+sizeY)
+      context.lineTo(pos.x, pos.y + sizeY)
     }
     context.closePath()
     context.fill()
@@ -143,9 +143,9 @@ function createTrail(options) {
     context.beginPath()
     context.lineJoin = "round"
     context.strokeStyle = particlesColor
-    context.lineWidth = Math.min(sizeX,sizeY)
+    context.lineWidth = Math.min(sizeX, sizeY)
     // for up&down
-    let offset = -sizeX/2 + sizeY/2
+    let offset = -sizeX / 2 + sizeY / 2
     for (const particleIndex in particles) {
       const pos = particles[particleIndex].position
       if (particleIndex == 0) {
@@ -163,11 +163,11 @@ function createTrail(options) {
     context.clearRect(0, 0, width, height)
     calculatePosition()
 
-    if (style=="line") drawPath()
-    else if (style=="block") drawLines()
+    if (style == "line") drawPath()
+    else if (style == "block") drawLines()
   }
 
-  function updateCursorSize(newSize,newSizeY) {
+  function updateCursorSize(newSize, newSizeY) {
     sizeX = newSize
     if (newSizeY) sizeY = newSizeY
   }
@@ -188,7 +188,7 @@ async function createCursorHandler(handlerFunctions) {
   /** @type { Element } */
   let editor
   while (!editor) {
-    await new Promise(resolve=>setTimeout(resolve, 100))
+    await new Promise(resolve => setTimeout(resolve, 100))
     editor = document.querySelector(".part.editor")
   }
   handlerFunctions?.onStarted(editor)
@@ -200,25 +200,25 @@ async function createCursorHandler(handlerFunctions) {
   let lastCursor = 0
 
   // cursor update handler
-  function createCursorUpdateHandler(target,cursorId,cursorHolder,minimap) {
-    let lastX,lastY // save last position
-    let update = (editorX,editorY)=>{
+  function createCursorUpdateHandler(target, cursorId, cursorHolder, minimap) {
+    let lastX, lastY // save last position
+    let update = (editorX, editorY) => {
       // If cursor was destroyed, remove update handler
       if (!lastObjects[cursorId]) {
-        updateHandlers.splice(updateHandlers.indexOf(update),1)
+        updateHandlers.splice(updateHandlers.indexOf(update), 1)
         return
       }
 
       // get cursor position
-      let {left:newX,top:newY} = target.getBoundingClientRect()
-      let revX = newX-editorX,revY = newY-editorY
+      let { left: newX, top: newY } = target.getBoundingClientRect()
+      let revX = newX - editorX, revY = newY - editorY
 
       // if have no changes, ignore
       if (revX == lastX && revY == lastY && lastCursor == cursorId) return
-      lastX = revX;lastY = revY // update last position
+      lastX = revX; lastY = revY // update last position
 
       // wrong position
-      if (revX<=0 || revY<=0) return
+      if (revX <= 0 || revY <= 0) return
 
       // if it is invisible, ignore
       if (target.style.visibility == "hidden") return
@@ -231,16 +231,16 @@ async function createCursorHandler(handlerFunctions) {
 
       // update corsor position
       lastCursor = cursorId
-      handlerFunctions?.onCursorPositionUpdated(revX,revY)
-      handlerFunctions?.onCursorSizeUpdated(target.clientWidth,target.clientHeight)
+      handlerFunctions?.onCursorPositionUpdated(revX, revY)
+      handlerFunctions?.onCursorSizeUpdated(target.clientWidth, target.clientHeight)
     }
     updateHandlers.push(update)
   }
 
   // handle cursor create/destroy event (using polling, due to event handlers are LAGGY)
   let lastVisibility = "hidden"
-  setInterval(async ()=>{
-    let now = [],count = 0
+  setInterval(async () => {
+    let now = [], count = 0
     // created
     for (const target of editor.getElementsByClassName("cursor")) {
       if (target.style.visibility != "hidden") count++
@@ -251,15 +251,15 @@ async function createCursorHandler(handlerFunctions) {
       let thisCursorId = cursorId++
       now.push(thisCursorId)
       lastObjects[thisCursorId] = target
-      target.setAttribute("cursorId",thisCursorId)
+      target.setAttribute("cursorId", thisCursorId)
       let cursorHolder = target.parentElement.parentElement.parentElement
       let minimap = cursorHolder.parentElement.querySelector(".minimap")
-      createCursorUpdateHandler(target,thisCursorId,cursorHolder,minimap)
+      createCursorUpdateHandler(target, thisCursorId, cursorHolder, minimap)
       // console.log("DEBUG-CursorCreated",thisCursorId)
     }
-    
+
     // update visible
-    let visibility = count<=1 ? "visible" : "hidden"
+    let visibility = count <= 1 ? "visible" : "hidden"
     if (visibility != lastVisibility) {
       handlerFunctions?.onCursorVisibilityChanged(visibility)
       lastVisibility = visibility
@@ -271,19 +271,19 @@ async function createCursorHandler(handlerFunctions) {
       delete lastObjects[+id]
       // console.log("DEBUG-CursorRemoved",+id)
     }
-  },handlerFunctions?.cursorUpdatePollingRate || 500)
+  }, handlerFunctions?.cursorUpdatePollingRate || 500)
 
   // read cursor position polling
   function updateLoop() {
-    let {left:editorX,top:editorY} = editor.getBoundingClientRect()
-    for (handler of updateHandlers) handler(editorX,editorY)
+    let { left: editorX, top: editorY } = editor.getBoundingClientRect()
+    for (handler of updateHandlers) handler(editorX, editorY)
     handlerFunctions?.onLoop()
     requestAnimationFrame(updateLoop)
   }
 
   // handle editor view size changed event
   function updateEditorSize() {
-    handlerFunctions?.onEditorSizeUpdated(editor.clientWidth,editor.clientHeight)
+    handlerFunctions?.onEditorSizeUpdated(editor.clientWidth, editor.clientHeight)
   }
   new ResizeObserver(updateEditorSize).observe(editor)
   updateEditorSize()
@@ -294,14 +294,14 @@ async function createCursorHandler(handlerFunctions) {
 }
 
 // Main handler code
-let cursorCanvas,rainbowCursorHandle
+let cursorCanvas, rainbowCursorHandle
 createCursorHandler({
 
   // cursor create/destroy event handler polling rate
   cursorUpdatePollingRate: CursorUpdatePollingRate,
 
   // When editor instance stared
-  onStarted: (editor)=>{
+  onStarted: (editor) => {
     // create new canvas for make animation
     cursorCanvas = document.createElement("canvas")
     cursorCanvas.style.pointerEvents = "none"
@@ -331,31 +331,31 @@ createCursorHandler({
     })
   },
 
-  onReady:()=>{},
+  onReady: () => { },
 
   // when cursor moved
-  onCursorPositionUpdated: (x,y)=>{
-    rainbowCursorHandle.move(x,y)
+  onCursorPositionUpdated: (x, y) => {
+    rainbowCursorHandle.move(x, y)
   },
 
   // when editor view size changed
-  onEditorSizeUpdated: (x,y)=>{
-    rainbowCursorHandle.updateSize(x,y)
+  onEditorSizeUpdated: (x, y) => {
+    rainbowCursorHandle.updateSize(x, y)
   },
 
   // when cursor size changed (emoji, ...)
-  onCursorSizeUpdated: (x,y)=>{
-    rainbowCursorHandle.updateCursorSize(x,y)
+  onCursorSizeUpdated: (x, y) => {
+    rainbowCursorHandle.updateCursorSize(x, y)
     // rainbowCursorHandle.updateCursorSize(parseInt(y/lineHeight))
   },
 
   // when using multi cursor... just hide all
-  onCursorVisibilityChanged: (visibility)=>{
+  onCursorVisibilityChanged: (visibility) => {
     cursorCanvas.style.visibility = visibility
   },
 
   // update animation
-  onLoop: ()=>{
+  onLoop: () => {
     rainbowCursorHandle.updateParticles()
   },
 
